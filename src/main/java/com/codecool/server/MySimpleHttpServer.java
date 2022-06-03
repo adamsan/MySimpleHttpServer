@@ -28,7 +28,10 @@ public class MySimpleHttpServer {
     public void start() {
         System.out.println("Starting server");
         try {
-            tryToRespond();
+            int i = 10;
+            while (i-- > 0) {
+                tryToRespond();
+            }
         } catch (IOException ex) {
             throw new MySimpleHttpServerException(ex);
         }
