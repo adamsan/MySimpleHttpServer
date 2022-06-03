@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDateTime;
 
 public class MySimpleHttpServer {
@@ -38,13 +40,14 @@ public class MySimpleHttpServer {
     }
 
     private void tryToRespond() throws IOException {
+        String requestedPage = "";
         Socket socket = serverSocket.accept();
         BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         String line;
         while ((line = reader.readLine()) != null) {
             System.out.println(line);
             if (line.matches("GET /.* HTTP/1.1")) {
-                String requestedPage = line.split(" ")[1];
+                requestedPage = line.split(" ")[1];
                 System.out.println("Requested page:" + requestedPage);
             }
 
@@ -53,19 +56,30 @@ public class MySimpleHttpServer {
         System.out.println("------------------------------");
         LocalDateTime now = LocalDateTime.now();
         PrintWriter writer = new PrintWriter(socket.getOutputStream());
-        writer.println("""
-                HTTP/1.1 200 OK
-                Content-Type: text/html
-                                                
-                <html>
-                <head><title>My simple server response page</title><head>
-                <body>
-                <h1>Simple webserver page</h1>
-                <div>Would you have thought, a webserver can be so simple?  </div>
-                <p>Current time is: %s</p>
-                </body>
-                </html>
-                """.formatted(now));
+        if (requestedPage.equals("/favicon.ico")) {
+            String lines = String.join("", Files.readAllLines(Path.of("src/main/resources/drawing.svg")));
+            writer.println("""
+                    HTTP/1.1 200 OK
+                    Content-Type: image/svg+xml
+                                        
+                    """ + lines);
+        } else {
+            writer.println("""
+                    HTTP/1.1 200 OK
+                    Content-Type: text/html
+                                                    
+                    <html>
+                    <head><title>My simple server response page</title>
+                    <link rel="icon" href="/favicon.ico" sizes="any">
+                    <head>
+                    <body>
+                    <h1>Simple webserver page</h1>
+                    <div>Would you have thought, a webserver can be so simple?  </div>
+                    <p>Current time is: %s</p>
+                    </body>
+                    </html>
+                    """.formatted(now));
+        }
         writer.flush();
         writer.close();
     }
