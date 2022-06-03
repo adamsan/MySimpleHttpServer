@@ -28,6 +28,7 @@ class MySimpleHttpServerTest {
     }
 
     @Test
+    @Timeout(5)
     void webserverRespondsToOneRequest() throws IOException {
 
         MyResponse resp = sendGetRequest("http://localhost:8002");
@@ -36,15 +37,25 @@ class MySimpleHttpServerTest {
         assertTrue(resp.content.contains("Simple webserver page"));
     }
 
+    @Test
+    @Timeout(5)
+    void webserverRespondsToMultipleRequests() throws IOException {
+        for (int i = 0; i < 10; i++) {
+            MyResponse resp = sendGetRequest("http://localhost:8002");
+            assertEquals(200, resp.status, "Status code is 200 (OK)");
+        }
+    }
+
     private MyResponse sendGetRequest(String urlString) throws IOException {
         URL url = new URL(urlString);
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
         con.setConnectTimeout(500);
+        con.setReadTimeout(500);
 
         int status = con.getResponseCode();
         String contentType = con.getContentType();
-        String content = null;
+        String content;
         try (var in = new BufferedReader(new InputStreamReader(con.getInputStream()))) {
             content = in.lines().collect(Collectors.joining("\n"));
         }
