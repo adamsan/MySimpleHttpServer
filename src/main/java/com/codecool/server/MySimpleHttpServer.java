@@ -16,7 +16,7 @@ public class MySimpleHttpServer {
         try {
             serverSocket = new ServerSocket(port);
         } catch (IOException e) {
-            throw new MySimleHttpServerException(e);
+            throw new MySimpleHttpServerException(e);
         }
     }
 
@@ -26,55 +26,59 @@ public class MySimpleHttpServer {
     }
 
     public void start() {
+        System.out.println("Starting server");
         try {
-            System.out.println("Starting server");
-            Socket socket = serverSocket.accept();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            String line;
-            while ((line = reader.readLine()) != null) {
-                System.out.println(line);
-                if (line.matches("GET /.* HTTP/1.1")) {
-                    String requestedPage = line.split(" ")[1];
-                    System.out.println("Requested page:" + requestedPage);
-                }
-
-                if (line.isEmpty()) break;
-            }
-            System.out.println("------------------------------");
-            LocalDateTime now = LocalDateTime.now();
-            PrintWriter writer = new PrintWriter(socket.getOutputStream());
-            writer.println("""
-                    HTTP/1.1 200 OK
-                    Content-Type: text/html
-                                                    
-                    <html>
-                    <head><title>My simple server response page</title><head>
-                    <body>
-                    <h1>Simple webserver page</h1>
-                    <div>Would you have thought, a webserver can be so simple?  </div>
-                    <p>Current time is: %s</p>
-                    </body>
-                    </html>
-                    """.formatted(now));
-            writer.flush();
-            writer.close();
+            tryToRespond();
         } catch (IOException ex) {
-            throw new MySimleHttpServerException(ex);
+            throw new MySimpleHttpServerException(ex);
         }
+    }
+
+    private void tryToRespond() throws IOException {
+        Socket socket = serverSocket.accept();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        String line;
+        while ((line = reader.readLine()) != null) {
+            System.out.println(line);
+            if (line.matches("GET /.* HTTP/1.1")) {
+                String requestedPage = line.split(" ")[1];
+                System.out.println("Requested page:" + requestedPage);
+            }
+
+            if (line.isEmpty()) break;
+        }
+        System.out.println("------------------------------");
+        LocalDateTime now = LocalDateTime.now();
+        PrintWriter writer = new PrintWriter(socket.getOutputStream());
+        writer.println("""
+                HTTP/1.1 200 OK
+                Content-Type: text/html
+                                                
+                <html>
+                <head><title>My simple server response page</title><head>
+                <body>
+                <h1>Simple webserver page</h1>
+                <div>Would you have thought, a webserver can be so simple?  </div>
+                <p>Current time is: %s</p>
+                </body>
+                </html>
+                """.formatted(now));
+        writer.flush();
+        writer.close();
     }
 
     public void stop() {
         try {
             serverSocket.close();
         } catch (IOException e) {
-            throw new MySimleHttpServerException(e);
+            throw new MySimpleHttpServerException(e);
         }
     }
 }
 
-class MySimleHttpServerException extends RuntimeException {
+class MySimpleHttpServerException extends RuntimeException {
 
-    public MySimleHttpServerException(IOException e) {
+    public MySimpleHttpServerException(IOException e) {
         super(e);
     }
 }
