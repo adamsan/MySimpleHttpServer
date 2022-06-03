@@ -13,3 +13,5 @@ Implement a simple HTTP server, that listens on port 8002, and responds to every
 ## Material
 
 - https://www.baeldung.com/a-guide-to-java-sockets
+- https://www.baeldung.com/java-http-request
+- https://www.baeldung.com/java-runnable-vs-extending-thread
