@@ -7,6 +7,8 @@ Implement a simple HTTP server, that listens on port 8002, and responds to every
 ## Tasks
 
 - Implement a server, that responds to one request, responds with the page, then quits.
+  - The response page's content type should be `text/html`
+  - The response page should contain the text (h1): `Simple webserver page`
 - Change the code, so that the server can respond to multiple requests.
 - Implement, that the server can respond to multiple simultanous request.
 
